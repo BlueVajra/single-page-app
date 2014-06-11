@@ -1,3 +1,9 @@
-<div class="person">
+<div class="person" data-person='<%= JSON.stringify(people[i], ["first_name", "last_name", "address"]) %>'>
+  <div class="actions">
+    <a href="#" class="edit">edit</a>
+  </div>
   <%= person.first_name %> <%= person.last_name %>
+  <blockquote>
+    <%= person.address %>
+  </blockquote>
 </div>

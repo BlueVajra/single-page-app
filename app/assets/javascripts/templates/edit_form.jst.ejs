@@ -1,0 +1,23 @@
+<div class="person">
+  <div class="person-edit">
+    <form action="#" class="edit-form">
+
+      <div class="form-row">
+        <label class="form-label">First name</label>
+        <input type="text" class="form-control first_name" name="First name" value="<%= person.first_name%>">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Last name</label>
+        <input type="text" class="form-control last_name" name="Last name" value="<%= person.last_name%>">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Address</label>
+        <textarea class="form-control address" name="Address"><%= person.address %></textarea>
+      </div>
+
+      <input type="submit" value="Update Person" class="form-button">
+    </form>
+  </div>
+</div>

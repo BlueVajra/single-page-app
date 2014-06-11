@@ -24,4 +24,14 @@ feature 'The one-page contact manager app' do
     expect(page).to have_content 'Schmoe'
     expect(page).to have_content '22 Pearl St'
   end
+
+  scenario 'User edits a person', js: true do
+    visit '/'
+    page.find('div.person', :text => 'Joe').click_link('edit')
+    expect(page).to have_content "15 Main St"
+    fill_in 'Address', with: '22 Pearl St'
+    click_button 'Update Person'
+    expect(page).to have_content "22 Pearl St"
+
+  end
 end
