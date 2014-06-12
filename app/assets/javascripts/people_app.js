@@ -44,7 +44,15 @@ window.PeopleApp = {
     personToEdit.hide();
 
     $('.edit-form').on("submit", personToEdit, this.editPerson.bind(this));
+    $('.person-edit').on("click", ".actions a", personToEdit, this.cancelEditPerson.bind(this));
     event.preventDefault();
+  },
+
+  cancelEditPerson: function(event){
+    var $personToEdit = event.data;
+    var $editForm = $(event.currentTarget).closest('.person')
+    $personToEdit.show();
+    $editForm.remove();
   },
 
   editPerson: function(event){

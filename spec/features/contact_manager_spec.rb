@@ -29,9 +29,22 @@ feature 'The one-page contact manager app' do
     visit '/'
     page.find('div.person', :text => 'Joe').click_link('edit')
     expect(page).to have_content "15 Main St"
-    fill_in 'Address', with: '22 Pearl St'
+    within page.find('.edit-form') do
+      fill_in 'Address', with: '22 Pearl St'
+    end
     click_button 'Update Person'
     expect(page).to have_content "22 Pearl St"
+  end
 
+  scenario 'User cancels an edit', js: true do
+    visit '/'
+    page.find('div.person', :text => 'Joe').click_link('edit')
+    expect(page).to have_content "15 Main St"
+    within page.find('.edit-form') do
+      fill_in 'Address', with: '22 Pearl St'
+    end
+    click_link 'cancel'
+    expect(page).to_not have_content "22 Pearl St"
+    expect(page).to have_content "15 Main St"
   end
 end
