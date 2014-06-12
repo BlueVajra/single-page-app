@@ -3,13 +3,13 @@ window.PeopleApp = {
 
     $.getJSON("/api/people", this.renderPeople.bind(this));
     $('.create-form').on("submit", this.createPerson.bind(this));
+    $("div[data-container='people']").on("click", ".edit", this.renderEditForm.bind(this));
 
   },
 
   renderPeople: function(data){
     html = JST['templates/people']({people: data._embedded.people});
     $("main .container div[data-container='people']").append(html);
-    $('.edit').on("click", this.renderEditForm.bind(this));
   },
 
   createPerson: function(event){
@@ -30,10 +30,7 @@ window.PeopleApp = {
   renderPerson: function(response){
     html = JST['templates/person']({person: response});
     $("main .container div[data-container='people']").append(html);
-    $('.edit').on("click", this.renderEditForm.bind(this));
-
     $(".create-form").get(0).reset();
-
   },
 
   renderEditForm: function(event){
@@ -44,7 +41,8 @@ window.PeopleApp = {
     personToEdit.hide();
 
     $('.edit-form').on("submit", personToEdit, this.editPerson.bind(this));
-    $('.person-edit').on("click", ".actions a", personToEdit, this.cancelEditPerson.bind(this));
+    $('.person-edit').on("click", ".actions a:contains('cancel')", personToEdit, this.cancelEditPerson.bind(this));
+    $('.person-edit').on("click", ".actions a:contains('delete')", personToEdit, this.deletePerson.bind(this));
     event.preventDefault();
   },
 
@@ -53,6 +51,28 @@ window.PeopleApp = {
     var $editForm = $(event.currentTarget).closest('.person')
     $personToEdit.show();
     $editForm.remove();
+    event.preventDefault();
+  },
+
+  deletePerson: function(event){
+    var $personToEdit = event.data;
+    var $editForm = $(event.currentTarget).closest('.person')
+
+    var thisPath = $editForm.data("person")._links.self.href;
+
+    $.ajax({
+      type: "DELETE",
+      url: thisPath,
+      data: {},
+      success: function(response){PeopleApp.removePerson(response, $personToEdit, $editForm)}
+    });
+
+    event.preventDefault();
+  },
+
+  removePerson: function(response, deletedPerson, editedForm){
+    deletedPerson.remove();
+    editedForm.remove();
   },
 
   editPerson: function(event){

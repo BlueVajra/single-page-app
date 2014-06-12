@@ -47,4 +47,12 @@ feature 'The one-page contact manager app' do
     expect(page).to_not have_content "22 Pearl St"
     expect(page).to have_content "15 Main St"
   end
+
+  scenario 'User deletes a person', js: true do
+    visit '/'
+    expect(page).to have_content "Joe"
+    page.find('div.person', :text => 'Joe').click_link('edit')
+    click_link('delete')
+    expect(page).to_not have_content "Joe"
+  end
 end
