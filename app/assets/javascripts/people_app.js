@@ -2,8 +2,11 @@ window.PeopleApp = {
   initialize: function () {
 
     $.getJSON("/api/people", this.renderPeople.bind(this));
-    $('.create-form').on("submit", this.createPerson.bind(this));
-    $("div[data-container='people']").on("click", ".edit", this.renderEditForm.bind(this));
+    $(document).on("submit", '.create-form', this.createPerson.bind(this));
+    $(document).on("click", ".edit", this.renderEditForm.bind(this));
+    $(document).on("submit", '.edit-form', this.editPerson.bind(this));
+    $(document).on("click", "a:contains('cancel')", this.cancelEditPerson.bind(this));
+    $(document).on("click", "a:contains('delete')", this.deletePerson.bind(this));
 
   },
 
@@ -34,76 +37,60 @@ window.PeopleApp = {
   },
 
   renderEditForm: function(event){
-    var personToEdit = $(event.currentTarget).closest('.person');
-    html = JST['templates/edit_form']({person: personToEdit.data("person")});
+    var $personToEdit = $(event.currentTarget).closest('.person');
+    html = JST['templates/edit_form']({person: $personToEdit.data("person")});
 
-    personToEdit.before(html);
-    personToEdit.hide();
-
-    $('.edit-form').on("submit", personToEdit, this.editPerson.bind(this));
-    $('.person-edit').on("click", ".actions a:contains('cancel')", personToEdit, this.cancelEditPerson.bind(this));
-    $('.person-edit').on("click", ".actions a:contains('delete')", personToEdit, this.deletePerson.bind(this));
+    $personToEdit.append(html);
+    $personToEdit.find('.person_information').hide();
     event.preventDefault();
   },
 
   cancelEditPerson: function(event){
-    var $personToEdit = event.data;
-    var $editForm = $(event.currentTarget).closest('.person')
-    $personToEdit.show();
-    $editForm.remove();
+    var $personToEdit = $(event.currentTarget).closest('.person');
+    $personToEdit.find('.person_information').show();
+    $personToEdit.find('.person-edit').remove();
     event.preventDefault();
   },
 
   deletePerson: function(event){
-    var $personToEdit = event.data;
-    var $editForm = $(event.currentTarget).closest('.person')
-
-    var thisPath = $editForm.data("person")._links.self.href;
+    var $personToEdit = $(event.currentTarget).closest('.person');
+    var thisPath = $personToEdit.data("person")._links.self.href;
 
     $.ajax({
       type: "DELETE",
       url: thisPath,
       data: {},
-      success: function(response){PeopleApp.removePerson(response, $personToEdit, $editForm)}
+      success: function(){$personToEdit.remove();}
     });
 
     event.preventDefault();
   },
 
-  removePerson: function(response, deletedPerson, editedForm){
-    deletedPerson.remove();
-    editedForm.remove();
-  },
-
   editPerson: function(event){
-    var personToEdit = event.data;
-    var $thisPerson = $(event.currentTarget).closest('.person');
+    var $personToEdit = $(event.currentTarget).closest('.person');
     var person = {
-      "first_name": $thisPerson.find('input.first_name').val(),
-      "last_name": $thisPerson.find('input.last_name').val(),
-      "address": $thisPerson.find('textarea.address').val()
+      "first_name": $personToEdit.find('input.first_name').val(),
+      "last_name": $personToEdit.find('input.last_name').val(),
+      "address": $personToEdit.find('textarea.address').val()
     }
 
-    var thisPath = $thisPerson.data("person")._links.self.href;
+    var thisPath = $personToEdit.data("person")._links.self.href;
 
     $.ajax({
       type: "PUT",
       url: thisPath,
       data: JSON.stringify(person, ["first_name", "last_name", "address"]),
-      success: function(response){PeopleApp.updatePerson(response, personToEdit, $thisPerson)},
+      success: function(response){PeopleApp.updatePerson(response, $personToEdit)},
       dataType: 'json'
     });
 
     event.preventDefault();
   },
 
-  updatePerson: function(response, editedPerson, editedForm){
+  updatePerson: function(response, $personToEdit){
     html = JST['templates/person']({person: response});
-    editedPerson.before(html);
-    $('.edit').on("click", this.renderEditForm.bind(this));
-
-    editedPerson.remove();
-    editedForm.remove();
+    $personToEdit.before(html);
+    $personToEdit.remove();
   }
 }
 

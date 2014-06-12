@@ -1,5 +1,6 @@
 <% for(var i = 0; i < people.length; i++) { %>
 <div class="person" data-person='<%= JSON.stringify(people[i]) %>'>
+  <div class="person_information">
   <div class="actions">
     <a href="#" class="edit">edit</a>
   </div>
@@ -7,5 +8,6 @@
   <blockquote>
     <%= people[i].address %>
   </blockquote>
+    </div>
 </div>
 <% } %>
